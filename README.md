@@ -35,6 +35,8 @@ Status: ✅ 7/7 tests passing with Newman
 * Environment Variables
 * JavaScript Test Scripts
 * Collection Runner
+* Newman CLI
+* Git & GitHub
 
 ## API Screenshots
 
