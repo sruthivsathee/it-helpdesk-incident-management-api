@@ -32,6 +32,7 @@ A Postman API project that simulates an enterprise IT Helpdesk incident manageme
 
 * All API requests executed successfully.
 * Collection Runner: **7/7 tests passed**.
+### Collection Runner Screenshot
 
 ## Documentation
 
