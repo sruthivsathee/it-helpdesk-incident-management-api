@@ -28,6 +28,14 @@ A Postman API project that simulates an enterprise IT Helpdesk incident manageme
 * JavaScript Test Scripts
 * Collection Runner
 
+## API Screenshots
+
+### Login API
+![Login API](screenshots/login-api.png)
+
+### Create Ticket API
+![Create Ticket API](screenshots/create-ticket-api.png)
+
 ## Test Results
 
 * All API requests executed successfully.
