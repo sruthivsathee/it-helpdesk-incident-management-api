@@ -1,0 +1,426 @@
+{
+  "info": {
+    "_postman_id": "ff1c2f2f-5486-4872-a819-2c785df96548",
+    "name": "IT Helpdesk Incident Management API",
+    "description": "# Enterprise IT Helpdesk Incident Management API\n\nA Postman project that simulates a real enterprise IT Helpdesk system.\n\n### Features\n\n- Employee Login & Authentication\n    \n- Incident Ticket Creation\n    \n- Ticket Assignment to Support Agents\n    \n- SLA & Priority Automation\n    \n- Laptop Asset Assignment\n    \n- Automated API Testing\n    \n- Collection Runner Workflow\n    \n- Mock Server Integration",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "31876883",
+    "_collection_link": "https://go.postman.co/collection/31876883-ff1c2f2f-5486-4872-a819-2c785df96548?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "01 Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response = pm.response.json();\r",
+                  "\r",
+                  "pm.environment.set(\"token\", response.token);\r",
+                  "pm.environment.set(\"user_id\", response.userId);\r",
+                  "\r",
+                  "pm.test(\"Login successful\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"sruthi.vs@company.com\",\r\n    \"password\": \"Password@123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "description": "## Login API\n\nAuthenticates an employee and returns a Bearer token.\n\n**Method:** POST\n\n**Endpoint:** `/login`\n\n### Purpose\n\nThis API verifies employee credentials and generates an authentication token that is used in all protected IT Helpdesk APIs.\n\n### Response\n\n- `userId` – Employee ID.\n    \n- `role` – Employee role.\n    \n- `token` – Bearer token used for authorization."
+          },
+          "response": [
+            {
+              "name": "200 Login Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"sruthi.vs@company.com\"\r\n    \"password\": \"Password@123\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "login"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                }
+              ],
+              "cookie": [],
+              "body": "{\r\n  \"userId\": \"EMP1001\",\r\n  \"name\": \"Sruthi VS\",\r\n  \"role\": \"Employee\",\r\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ITHELPDESK.TOKEN12345\"\r\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 Tickets",
+      "item": [
+        {
+          "name": "Create Ticket",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Status code is 201\", () => {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Ticket ID exists\", () => {\r",
+                  "    pm.expect(response.ticketId).to.exist;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Ticket status is Open\", () => {\r",
+                  "    pm.expect(response.status).to.eql(\"Open\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.environment.set(\"ticket_id\", response.ticketId);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "let body = JSON.parse(pm.request.body.raw);\r",
+                  "let hours = 24;\r",
+                  "\r",
+                  "if (body.priority === \"Critical\") hours = 2;\r",
+                  "else if (body.priority === \"High\") hours = 4;\r",
+                  "else if (body.priority === \"Medium\") hours = 8;\r",
+                  "\r",
+                  "let deadline = new Date();\r",
+                  "deadline.setHours(deadline.getHours() + hours);\r",
+                  "\r",
+                  "pm.environment.set(\"sla_hours\", hours);\r",
+                  "pm.environment.set(\"sla_deadline\", deadline.toISOString());"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"employeeName\": \"Sruthi VS\",\r\n  \"department\": \"Engineering\",\r\n  \"issueType\": \"VPN Access\",\r\n  \"priority\": \"High\",\r\n  \"description\": \"Unable to connect to company VPN.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/tickets",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tickets"
+              ]
+            },
+            "description": "## Create Ticket API\n\nCreates a new IT support incident ticket.\n\n**Method:** POST\n\n**Endpoint:** `/tickets`\n\n### Purpose\n\nEmployees use this API to report IT issues such as VPN, laptop, software, or email problems.\n\n### Request Body\n\n- `employeeName`\n    \n- `department`\n    \n- `issueType`\n    \n- `priority`\n    \n- `description`\n    \n\n### Response\n\nReturns a unique `ticketId`, ticket status, priority, and confirmation message."
+          },
+          "response": [
+            {
+              "name": "201 Ticket Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"employeeName\": \"Sruthi VS\",\r\n  \"department\": \"Engineering\",\r\n  \"issueType\": \"VPN Access\",\r\n  \"priority\": \"High\",\r\n  \"description\": \"Unable to connect to company VPN.\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/tickets",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "tickets"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                }
+              ],
+              "cookie": [],
+              "body": "{\r\n  \"ticketId\": \"INC1001\",\r\n  \"status\": \"Open\",\r\n  \"priority\": \"High\",\r\n  \"assignedTo\": null,\r\n  \"message\": \"Ticket created successfully.\"\r\n}"
+            }
+          ]
+        },
+        {
+          "name": "Assign Ticket",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Status code is 200\", () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Ticket assigned successfully\", () => {\r",
+                  "    pm.expect(response.status).to.eql(\"Assigned\");\r",
+                  "    pm.expect(response.assignedTo).to.eql(\"AGENT1001\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"assignedTo\": \"AGENT1001\",\r\n  \"agentName\": \"Rahul Nair\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/tickets/{{ticket_id}}/assign",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tickets",
+                "{{ticket_id}}",
+                "assign"
+              ]
+            },
+            "description": "## Assign Ticket API\n\nAssigns an incident ticket to a support engineer.\n\n**Method:** PATCH\n\n**Endpoint:** `/tickets/{ticket_id}/assign`\n\n### Purpose\n\nUsed by the IT Helpdesk team to assign an open ticket to a support agent.\n\n### Authorization\n\nBearer Token required.\n\n### Request Body\n\n- `assignedTo` – Support agent ID.\n    \n- `agentName` – Support engineer name.\n    \n\n### Response\n\nReturns assigned ticket details and confirmation message."
+          },
+          "response": [
+            {
+              "name": "200 Ticket Assigned",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"assignedTo\": \"AGENT1001\",\r\n  \"agentName\": \"Rahul Nair\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/tickets/INC1001/assign",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "tickets",
+                    "INC1001",
+                    "assign"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                }
+              ],
+              "cookie": [],
+              "body": "{\r\n  \"ticketId\": \"INC1001\",\r\n  \"status\": \"Assigned\",\r\n  \"assignedTo\": \"AGENT1001\",\r\n  \"agentName\": \"Rahul Nair\",\r\n  \"message\": \"Ticket assigned successfully.\"\r\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 Users",
+      "item": []
+    },
+    {
+      "name": "04 Assets",
+      "item": [
+        {
+          "name": "Assign Laptop",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response = pm.response.json();\r",
+                  "\r",
+                  "pm.environment.set(\"asset_id\", response.assetId);\r",
+                  "\r",
+                  "pm.test(\"Laptop assigned successfully\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"userId\": \"{{user_id}}\",\r\n  \"assetId\": \"LAPTOP1001\",\r\n  \"deviceName\": \"Dell Latitude 5440\",\r\n  \"serialNumber\": \"DL5440-2026-001\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/assets/laptop/assign",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "assets",
+                "laptop",
+                "assign"
+              ]
+            },
+            "description": "## Assign Laptop API\n\nAssigns a company laptop to an employee.\n\n**Method:** POST\n\n**Endpoint:** `/assets/laptop/assign`\n\n### Purpose\n\nUsed by the IT Asset Management team to allocate laptops to employees.\n\n### Authorization\n\nBearer Token required.\n\n### Request Body\n\n- `userId`\n    \n- `assetId`\n    \n- `deviceName`\n    \n- `serialNumber`\n    \n\n### Response\n\nReturns asset assignment status and confirmation message."
+          },
+          "response": [
+            {
+              "name": "200 Laptop Assigned",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/assets/laptop/assign",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "assets",
+                    "laptop",
+                    "assign"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                }
+              ],
+              "cookie": [],
+              "body": "{\r\n  \"assetId\": \"LAPTOP1001\",\r\n  \"status\": \"Assigned\",\r\n  \"assignedTo\": \"EMP1001\",\r\n  \"message\": \"Laptop assigned successfully.\"\r\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05 SLA Monitoring",
+      "item": []
+    },
+    {
+      "name": "06 Incident Reports",
+      "item": []
+    },
+    {
+      "name": "07 Health Checks",
+      "item": []
+    }
+  ]
+}
