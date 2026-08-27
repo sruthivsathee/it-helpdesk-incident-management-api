@@ -51,6 +51,9 @@ Status: ✅ 7/7 tests passing with Newman
 ### Collection Runner Screenshot
 ![Collection Runner - 7/7 Tests Passed](screenshots/test-run-7-of-7-passed.png)
 
+### Newman CLI Result
+![Newman Test Results](screenshots/newman-test-passed.png)
+
 ## Documentation
 
 Public Postman Documentation: https://documenter.getpostman.com/view/31876883/2sBYAuRAjJ
