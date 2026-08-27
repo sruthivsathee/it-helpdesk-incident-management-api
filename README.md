@@ -1,6 +1,11 @@
-# IT Helpdesk Incident Management API
+# IT Helpdesk Incident Management API (Postman)
+![Postman](https://img.shields.io/badge/Postman-API_Testing-orange)
+![Newman](https://img.shields.io/badge/Newman-7%2F7_Tests_Passed-green)
+![Mock Server](https://img.shields.io/badge/Mock_Server-Enabled-blue)
 
-A Postman API project that simulates an enterprise IT Helpdesk incident management workflow.
+A beginner-friendly enterprise-style Postman project that simulates an IT Helpdesk ticketing workflow using a Postman Mock Server, environment variables, automated test scripts, Collection Runner, and Newman CLI.
+
+Status: ✅ 7/7 tests passing with Newman
 
 **Live Postman Documentation:** https://documenter.getpostman.com/view/31876883/2sBYAuRAjJ
 
