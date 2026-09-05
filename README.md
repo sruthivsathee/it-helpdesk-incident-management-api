@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="assets/banner1.png" alt="IT Helpdesk Incident Management API Banner" width="100%">
+</p>
+
+
 # 🛠️ IT Helpdesk Incident Management API (Postman)
 
 <p align="left">
